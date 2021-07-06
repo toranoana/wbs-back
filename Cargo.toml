@@ -1,5 +1,5 @@
 [package]
-name = "wbs_api"
+name = "wbs_back"
 version = "0.1.0"
 authors = ["y-fujiwara <fuji.ys5234@gmail.com>"]
 edition = "2018"
