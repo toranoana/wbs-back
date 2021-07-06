@@ -1,0 +1,39 @@
+version: "3"
+services:
+  wbs-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wbs-api
+    init: true
+    command: ["tail","-f","/dev/null"]
+    volumes:
+      - ./:/usr/src/app
+      - rust_dev_target:/usr/src/app/target
+    tty: true
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db/wbs_development
+      - RUST_LOG=debug,actix_web=debug
+      - RUST_BACKTRACE=1
+      - ALLOW_CORS=http://localhost
+      - GRAPHQL_ENDPOINT_URL=http://127.0.0.1:3000/graphql
+    networks:
+      - default
+      - wbs_network
+  db:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5324:5324
+    networks:
+      - wbs_network
+volumes:
+  rust_dev_target:
+    external: true
+networks:
+  wbs_network:
+    external: true 
