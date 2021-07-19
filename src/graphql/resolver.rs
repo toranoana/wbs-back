@@ -3,11 +3,13 @@ use crate::db::repositories::project_repository::ProjectRepository;
 use crate::db::repositories::task_repository::TaskRepository;
 use crate::db::repositories::user_repository::UserRepository;
 use crate::db::repositories::memo_repository::MemoRepository;
+use crate::db::repositories::holiday_repository::HolidayRepository;
 use crate::graphql::schema::milestone::{Milestone, NewMilestone, UpdateMilestone};
 use crate::graphql::schema::project::{NewProject, Project, UpdateProject};
 use crate::graphql::schema::task::{NewTask, Task, UpdateTask};
 use crate::graphql::schema::user::{NewUser, UpdateUser, User};
 use crate::graphql::schema::memo::{NewMemo, UpdateMemo, Memo};
+use crate::graphql::schema::holiday::{NewHoliday, Holiday};
 use crate::graphql::schema::{Context, Mutation, Query};
 use diesel::result::Error;
 use juniper::{FieldError, FieldResult};
@@ -174,6 +176,11 @@ impl Mutation {
 
     async fn delete_memo(&self, context: &Context, id: i32) -> Result<Vec<Memo>, FieldError> {
         let ret = MemoRepository::delete_memo(context, id)?;
+        Ok(ret.into_iter().map(Into::into).collect())
+    }
+
+    async fn create_holiday(&self, context: &Context, new_holiday: NewHoliday) -> Result<Vec<Holiday>, FieldError> {
+        let ret = HolidayRepository::insert_memo(context, new_holiday)?;
         Ok(ret.into_iter().map(Into::into).collect())
     }
 }

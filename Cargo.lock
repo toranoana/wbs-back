@@ -2417,7 +2417,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c9ba19973a58daf4db6f352eda73dc0e289493cd29fb2632eb172085b6521acd"
 
 [[package]]
-name = "wbs_api"
+name = "wbs_back"
 version = "0.1.0"
 dependencies = [
  "actix-cors",
