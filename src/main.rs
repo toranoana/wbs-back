@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .wrap(
                 // Construct CORS middleware builder
-                Cors::new()
+                Cors::default()
                     .allowed_origin("http://localhost:3000")
                     .allowed_origin("http://127.0.0.1:3000")
                     .allowed_origin("http://localhost:8080")
@@ -68,8 +68,7 @@ async fn main() -> std::io::Result<()> {
                     .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
                     .allowed_header(header::CONTENT_TYPE)
                     .supports_credentials()
-                    .max_age(3600)
-                    .finish(),
+                    .max_age(3600),
             )
             .configure(routes)
     })
