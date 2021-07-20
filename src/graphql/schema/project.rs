@@ -7,7 +7,7 @@ use crate::graphql::schema::Context;
 use chrono::{Local, NaiveDate, ParseError};
 use core::cmp;
 use juniper::{FieldResult, ID};
-use serde::export::TryFrom;
+use std::convert::TryFrom;
 
 #[derive(Default, Debug)]
 pub struct Project {

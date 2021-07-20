@@ -25,7 +25,7 @@ pub mod schema;
 pub mod utils;
 pub mod view_schema;
 
-#[actix_rt::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let mut workers = 4;
     let mut use_unix_socket = true;
