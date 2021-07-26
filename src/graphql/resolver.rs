@@ -66,6 +66,17 @@ impl Query {
             .map_err(Into::into);
         tasks
     }
+    /// プロジェクトすべてを取得するクエリ
+    fn all_holidays(&self, context: &Context) -> FieldResult<Vec<Holiday>> {
+        // and_thenでResultを別種のResultに変換
+        // ここではinto_iterでイテレータを取得し、mapで値一つ一つに対するintoを呼び出した値
+        // 最後のcollectはイテレータをVecに戻しているだけ
+        // Errorの場合はmap_errに入るのでintoで適当な値に変換
+        let holidays = HolidayRepository::all_holidays(context)
+            .and_then(|holidays| Ok(holidays.into_iter().map(|h| h.into()).collect()))
+            .map_err(Into::into);
+        holidays
+    }
 }
 
 #[juniper::graphql_object(Context = Context)]
@@ -179,8 +190,13 @@ impl Mutation {
         Ok(ret.into_iter().map(Into::into).collect())
     }
 
-    async fn create_holiday(&self, context: &Context, new_holiday: NewHoliday) -> Result<Vec<Holiday>, FieldError> {
-        let ret = HolidayRepository::insert_memo(context, new_holiday)?;
+    async fn create_holiday(&self, context: &Context, new_holiday: NewHoliday) -> Result<Holiday, FieldError> {
+        let ret = HolidayRepository::insert_holiday(context, new_holiday)?;
+        Ok(ret.into())
+    }
+
+    async fn delete_holiday(&self, context: &Context, id: i32) -> Result<Vec<Holiday>, FieldError> {
+        let ret = HolidayRepository::delete_holiday(context, id)?;
         Ok(ret.into_iter().map(Into::into).collect())
     }
 }
