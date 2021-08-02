@@ -36,7 +36,7 @@ impl ProjectMilestonesLoadFn {
 
 #[async_trait]
 impl BatchFn<i32, Vec<Milestone>> for ProjectMilestonesLoadFn {
-    async fn load(&self, keys: &[i32]) -> HashMap<i32, Vec<Milestone>> {
+    async fn load(&mut self, keys: &[i32]) -> HashMap<i32, Vec<Milestone>> {
         let assoc_projects: Vec<AssocProject> = create_assoc_projects(keys.to_vec());
         let project_milestones: Vec<Vec<Milestone>> =
             self.project_milestones(keys).grouped_by(&assoc_projects);
