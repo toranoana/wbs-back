@@ -43,6 +43,14 @@ impl Query {
         projects
     }
 
+    /// プロジェクトすべてを取得するクエリ
+    fn archived_projects(&self, context: &Context) -> FieldResult<Vec<Project>> {
+        let projects = ProjectRepository::archived_projects(context)
+            .and_then(|projects| Ok(projects.into_iter().map(|p| p.into()).collect()))
+            .map_err(Into::into);
+        projects
+    }
+
     /// パラメータで与えられたIDのプロジェクトを取得するクエリ
     async fn find_project(&self, context: &Context, id: i32) -> FieldResult<Project> {
         let project = ProjectRepository::find_project(context, id)?;
@@ -85,9 +93,9 @@ impl Mutation {
         &self,
         context: &Context,
         new_project: NewProject,
-    ) -> Result<Project, FieldError> {
+    ) -> Result<Vec<Project>, FieldError> {
         let ret = ProjectRepository::insert_project(context, new_project)?;
-        Ok(ret.into())
+        Ok(ret.into_iter().map(Into::into).collect())
     }
 
     async fn create_user(&self, context: &Context, new_user: NewUser) -> Result<User, FieldError> {
