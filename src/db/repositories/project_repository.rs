@@ -18,9 +18,18 @@ pub struct ProjectRepository {}
 /// TODO: 各メソッドの引数をcontextからDataPgPoolに統一したい
 impl ProjectRepository {
     pub fn all_projects(context: &Context) -> Result<Vec<ProjectWithTaskDurationView>, Error> {
+        ProjectRepository::search_projects(context, false)
+    }
+
+    pub fn archived_projects(context: &Context) -> Result<Vec<ProjectWithTaskDurationView>, Error> {
+        ProjectRepository::search_projects(context, true)
+    }
+
+    fn search_projects(context: &Context, is_archive: bool) -> Result<Vec<ProjectWithTaskDurationView>, Error> {
         use crate::view_schema::project_with_task_duration_view::dsl::*;
         let conn = &context.pool.get().unwrap();
-        project_with_task_duration_view.load(conn)
+        let select_query = project_with_task_duration_view.filter(is_archived.eq(is_archive));
+        select_query.load(conn)
     }
 
     pub fn any_projects(
@@ -39,7 +48,7 @@ impl ProjectRepository {
     pub fn insert_project(
         context: &Context,
         new_project: NewProject,
-    ) -> Result<ProjectWithTaskDurationView, Box<dyn std::error::Error>> {
+    ) -> Result<Vec<ProjectWithTaskDurationView>, Box<dyn std::error::Error>> {
         use crate::schema::projects::dsl::*;
         use diesel::dsl::insert_into;
         let conn = &context.pool.get().unwrap();
@@ -47,10 +56,8 @@ impl ProjectRepository {
         let project_form: ProjectNewForm = (&new_project).try_into()?;
         let rows_inserted = insert_into(projects)
             .values(&project_form)
-            .returning(id)
-            .get_result(conn)?;
-        // TODO: updateと合わせて結果の取得方法がちょっと変
-        Ok(ProjectRepository::find_project(context, rows_inserted)?)
+            .execute(conn).and_then(|_| ProjectRepository::all_projects(context))?;
+        Ok(rows_inserted)
     }
 
     pub fn update_project(
