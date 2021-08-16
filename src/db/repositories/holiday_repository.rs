@@ -3,6 +3,7 @@ use crate::db::{
     models::holiday::{Holiday},
     models::holiday::{HolidayNewForm},
 };
+use chrono::{NaiveDate};
 use crate::graphql::schema::holiday::{NewHoliday, UpdateHoliday};
 use crate::graphql::schema::Context;
 use diesel::result::Error;
@@ -19,6 +20,16 @@ impl HolidayRepository {
         let conn = &context.pool.get().unwrap();
         // 構造体をばらしたtupleでもロードは可能
         holidays.load::<Holiday>(conn)
+    }
+
+    pub fn target_holidays(context: &Context, from: &str, to: &str) -> Result<Vec<Holiday>, Box<dyn std::error::Error>> {
+        use crate::schema::holidays::dsl::*;
+        let conn = &context.pool.get().unwrap();
+        // 構造体をばらしたtupleでもロードは可能
+        let from_date_time = NaiveDate::parse_from_str(&from, "%Y-%m-%d" )?.and_hms(00, 00, 00);
+        let to_date_time = NaiveDate::parse_from_str(&to, "%Y-%m-%d")?.and_hms(23, 59, 59);
+        let select_query = holidays.filter(target_at.between(from_date_time, to_date_time));
+        Ok(select_query.get_results::<Holiday>(conn)?)
     }
 
     pub fn insert_holiday(
