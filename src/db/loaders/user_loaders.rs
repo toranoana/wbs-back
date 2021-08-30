@@ -28,7 +28,7 @@ impl UsersLoadFn {
 
 #[async_trait]
 impl BatchFn<i32, User> for UsersLoadFn {
-    async fn load(&self, keys: &[i32]) -> HashMap<i32, User> {
+    async fn load(&mut self, keys: &[i32]) -> HashMap<i32, User> {
         let res = self.users(keys);
         // associationを取るためには構造体のUserが必要なのでidからダミーを作成
         res.iter().map(|u| (u.id, u.clone())).collect()

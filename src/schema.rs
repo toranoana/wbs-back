@@ -1,4 +1,14 @@
 table! {
+    holidays (id) {
+        id -> Int4,
+        holiday_name -> Varchar,
+        target_at -> Timestamptz,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
+    }
+}
+
+table! {
     memos (id) {
         id -> Int4,
         task_id -> Int4,
@@ -65,6 +75,7 @@ joinable!(tasks -> projects (project_id));
 joinable!(tasks -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
+    holidays,
     memos,
     milestones,
     projects,
