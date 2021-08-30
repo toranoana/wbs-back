@@ -41,7 +41,7 @@ impl UserTasksLoadFn {
 
 #[async_trait]
 impl BatchFn<i32, Vec<Task>> for UserTasksLoadFn {
-    async fn load(&mut self, keys: &[i32]) -> HashMap<i32, Vec<Task>> {
+    async fn load(&self, keys: &[i32]) -> HashMap<i32, Vec<Task>> {
         let assoc_users: Vec<AssocUser> = create_assoc_users(keys.to_vec());
         let user_tasks: Vec<Vec<Task>> = self.user_tasks(keys).grouped_by(&assoc_users);
         let result = assoc_users
@@ -73,7 +73,7 @@ impl ProjectTasksLoadFn {
 
 #[async_trait]
 impl BatchFn<i32, Vec<Task>> for ProjectTasksLoadFn {
-    async fn load(&mut self, keys: &[i32]) -> HashMap<i32, Vec<Task>> {
+    async fn load(&self, keys: &[i32]) -> HashMap<i32, Vec<Task>> {
         // associationを取るためには構造体のUserが必要なのでidからダミーを作成
         let assoc_projects: Vec<AssocProject> = create_assoc_projects(keys.to_vec());
         let project_tasks = self.project_tasks(keys).grouped_by(&assoc_projects);

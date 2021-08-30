@@ -31,7 +31,7 @@ impl ProjectsLoadFn {
 
 #[async_trait]
 impl BatchFn<i32, ProjectWithTaskDurationView> for ProjectsLoadFn {
-    async fn load(&mut self, keys: &[i32]) -> HashMap<i32, ProjectWithTaskDurationView> {
+    async fn load(&self, keys: &[i32]) -> HashMap<i32, ProjectWithTaskDurationView> {
         let res = self.projects(keys);
         // associationを取るためには構造体のUserが必要なのでidからダミーを作成
         res.iter().map(|p| (p.id, p.clone())).collect()

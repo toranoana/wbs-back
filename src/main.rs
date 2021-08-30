@@ -25,7 +25,7 @@ pub mod schema;
 pub mod utils;
 pub mod view_schema;
 
-#[actix_web::main]
+#[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let mut workers = 4;
     let mut use_unix_socket = true;
@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .wrap(
                 // Construct CORS middleware builder
-                Cors::default()
+                Cors::new()
                     .allowed_origin("http://localhost:3000")
                     .allowed_origin("http://127.0.0.1:3000")
                     .allowed_origin("http://localhost:8080")
@@ -68,7 +68,8 @@ async fn main() -> std::io::Result<()> {
                     .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
                     .allowed_header(header::CONTENT_TYPE)
                     .supports_credentials()
-                    .max_age(3600),
+                    .max_age(3600)
+                    .finish(),
             )
             .configure(routes)
     })

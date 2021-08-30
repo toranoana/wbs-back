@@ -3,13 +3,11 @@ use crate::db::repositories::project_repository::ProjectRepository;
 use crate::db::repositories::task_repository::TaskRepository;
 use crate::db::repositories::user_repository::UserRepository;
 use crate::db::repositories::memo_repository::MemoRepository;
-use crate::db::repositories::holiday_repository::HolidayRepository;
 use crate::graphql::schema::milestone::{Milestone, NewMilestone, UpdateMilestone};
 use crate::graphql::schema::project::{NewProject, Project, UpdateProject};
 use crate::graphql::schema::task::{NewTask, Task, UpdateTask};
 use crate::graphql::schema::user::{NewUser, UpdateUser, User};
 use crate::graphql::schema::memo::{NewMemo, UpdateMemo, Memo};
-use crate::graphql::schema::holiday::{NewHoliday, Holiday};
 use crate::graphql::schema::{Context, Mutation, Query};
 use diesel::result::Error;
 use juniper::{FieldError, FieldResult};
@@ -43,14 +41,6 @@ impl Query {
         projects
     }
 
-    /// プロジェクトすべてを取得するクエリ
-    fn archived_projects(&self, context: &Context) -> FieldResult<Vec<Project>> {
-        let projects = ProjectRepository::archived_projects(context)
-            .and_then(|projects| Ok(projects.into_iter().map(|p| p.into()).collect()))
-            .map_err(Into::into);
-        projects
-    }
-
     /// パラメータで与えられたIDのプロジェクトを取得するクエリ
     async fn find_project(&self, context: &Context, id: i32) -> FieldResult<Project> {
         let project = ProjectRepository::find_project(context, id)?;
@@ -74,17 +64,6 @@ impl Query {
             .map_err(Into::into);
         tasks
     }
-    /// プロジェクトすべてを取得するクエリ
-    fn all_holidays(&self, context: &Context) -> FieldResult<Vec<Holiday>> {
-        // and_thenでResultを別種のResultに変換
-        // ここではinto_iterでイテレータを取得し、mapで値一つ一つに対するintoを呼び出した値
-        // 最後のcollectはイテレータをVecに戻しているだけ
-        // Errorの場合はmap_errに入るのでintoで適当な値に変換
-        let holidays = HolidayRepository::all_holidays(context)
-            .and_then(|holidays| Ok(holidays.into_iter().map(|h| h.into()).collect()))
-            .map_err(Into::into);
-        holidays
-    }
 }
 
 #[juniper::graphql_object(Context = Context)]
@@ -93,9 +72,9 @@ impl Mutation {
         &self,
         context: &Context,
         new_project: NewProject,
-    ) -> Result<Vec<Project>, FieldError> {
+    ) -> Result<Project, FieldError> {
         let ret = ProjectRepository::insert_project(context, new_project)?;
-        Ok(ret.into_iter().map(Into::into).collect())
+        Ok(ret.into())
     }
 
     async fn create_user(&self, context: &Context, new_user: NewUser) -> Result<User, FieldError> {
@@ -195,16 +174,6 @@ impl Mutation {
 
     async fn delete_memo(&self, context: &Context, id: i32) -> Result<Vec<Memo>, FieldError> {
         let ret = MemoRepository::delete_memo(context, id)?;
-        Ok(ret.into_iter().map(Into::into).collect())
-    }
-
-    async fn create_holiday(&self, context: &Context, new_holiday: NewHoliday) -> Result<Holiday, FieldError> {
-        let ret = HolidayRepository::insert_holiday(context, new_holiday)?;
-        Ok(ret.into())
-    }
-
-    async fn delete_holiday(&self, context: &Context, id: i32) -> Result<Vec<Holiday>, FieldError> {
-        let ret = HolidayRepository::delete_holiday(context, id)?;
         Ok(ret.into_iter().map(Into::into).collect())
     }
 }
