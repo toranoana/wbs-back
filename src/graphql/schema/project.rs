@@ -1,8 +1,10 @@
 use crate::db::models::project_with_task_duration_view::ProjectWithTaskDurationView;
 use crate::db::models::*;
 use crate::db::repositories::task_repository::TaskRepository;
+use crate::db::repositories::holiday_repository::HolidayRepository;
 use crate::graphql::schema::milestone::Milestone;
 use crate::graphql::schema::task::Task;
+use crate::graphql::schema::holiday::Holiday;
 use crate::graphql::schema::Context;
 use chrono::{Local, NaiveDate, ParseError};
 use core::cmp;
@@ -71,6 +73,13 @@ impl Project {
             .into_iter()
             .map(|m| m.into())
             .collect())
+    }
+
+    async fn holidays(&self, context: &Context) -> FieldResult<Vec<Holiday>> {
+        let holidays = HolidayRepository::target_holidays(context, &self.started_at, &self.ended_at)
+            .and_then(|holidays| Ok(holidays.into_iter().map(|h| h.into()).collect()))
+            .map_err(Into::into);
+        holidays
     }
 }
 
