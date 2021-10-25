@@ -26,8 +26,12 @@ impl ProjectRepository {
     }
 
     fn search_projects(context: &Context, is_archive: bool) -> Result<Vec<ProjectWithTaskDurationView>, Error> {
+        ProjectRepository::search_pool_projects(&context.pool, is_archive)
+    }
+
+    pub fn search_pool_projects(pool: &DataPgPool, is_archive: bool) -> Result<Vec<ProjectWithTaskDurationView>, Error> {
         use crate::view_schema::project_with_task_duration_view::dsl::*;
-        let conn = &context.pool.get().unwrap();
+        let conn = &pool.get().unwrap();
         let select_query = project_with_task_duration_view.filter(is_archived.eq(is_archive));
         select_query.load(conn)
     }
@@ -65,23 +69,38 @@ impl ProjectRepository {
         pkey: i32,
         update_project: UpdateProject,
     ) -> Result<ProjectWithTaskDurationView, Box<dyn std::error::Error>> {
+        ProjectRepository::update_pool_project(pkey, update_project, &context.pool)?;
+        Ok(ProjectRepository::find_project(context, pkey)?)
+    }
+
+    pub fn update_pool_project(
+        pkey: i32,
+        update_project: UpdateProject,
+        pool: &DataPgPool,
+    ) -> Result<i32, Box<dyn std::error::Error>> {
         use crate::schema::projects::dsl::*;
         use diesel::dsl::update;
-        let conn = &context.pool.get().unwrap();
+        let conn = pool.get().unwrap();
         let project_form: ProjectUpdateForm = (&update_project).try_into()?;
-        let rows_inserted = update(projects.filter(id.eq(pkey)))
+        Ok(update(projects.filter(id.eq(pkey)))
             .set(&project_form)
             .returning(id)
-            .get_result(conn)?;
-        Ok(ProjectRepository::find_project(context, rows_inserted)?)
+            .get_result::<i32>(&conn)?)
     }
 
     pub fn find_project(
         context: &Context,
         pkey: i32,
     ) -> Result<ProjectWithTaskDurationView, Error> {
+        ProjectRepository::find_pool_project(&context.pool, pkey)
+    }
+
+    pub fn find_pool_project(
+        pool: &DataPgPool,
+        pkey: i32,
+    ) -> Result<ProjectWithTaskDurationView, Error> {
         use crate::view_schema::project_with_task_duration_view::dsl::*;
-        let conn = &context.pool.get().unwrap();
+        let conn = pool.get().unwrap();
         let select_query = project_with_task_duration_view.find(pkey).select((
             id,
             title,
@@ -94,6 +113,6 @@ impl ProjectRepository {
         ));
         let sql = debug_query::<Pg, _>(&select_query).to_string();
         debug!("{:?}", sql);
-        select_query.first(conn)
+        select_query.first(&conn)
     }
 }

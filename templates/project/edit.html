@@ -1,0 +1,30 @@
+{% extends "layouts/base.html" %} {% block title %}プロジェクト編集 - {{ super()
+}}{% endblock title %} {% block head %}{{ super() }}{% endblock head %} {% block
+content %}
+<h1>プロジェクト編集</h1>
+<form method="post" action="/admin/project/{{ project.id }}">
+  <p>id: {{ project.id }}</p>
+  <input type="hidden" name="id" value="{{ project.id }}" />
+  <div class="mb-3">
+    <label for="title-text" class="form-label">タイトル</label>
+    <input
+      id="title-text"
+      class="form-control"
+      type="text"
+      name="title"
+      value="{{ project.title }}"
+    />
+  </div>
+  <div class="mb-3">
+    <label for="title-color" class="form-label">色</label>
+    <input
+      id="title-color"
+      class="form-control"
+      type="color"
+      name="color"
+      value="{{ project.color }}"
+    />
+  </div>
+  <button class="btn btn-primary" type="submit">更新</button>
+</form>
+{% endblock content %}

@@ -95,11 +95,11 @@ pub struct NewProject {
 #[derive(juniper::GraphQLInputObject)]
 #[graphql(description = "A Project update")]
 pub struct UpdateProject {
-    title: Option<String>,
-    color: Option<String>,
-    is_archived: Option<bool>,
-    started_at: Option<String>,
-    ended_at: Option<String>,
+    pub title: Option<String>,
+    pub color: Option<String>,
+    pub is_archived: Option<bool>,
+    pub started_at: Option<String>,
+    pub ended_at: Option<String>,
 }
 
 impl From<project::Project> for Project {
