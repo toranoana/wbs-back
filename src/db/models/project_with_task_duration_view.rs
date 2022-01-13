@@ -1,7 +1,8 @@
 use crate::view_schema::project_with_task_duration_view;
 use chrono::NaiveDateTime;
+use serde::{Serialize};
 
-#[derive(Eq, PartialEq, Debug, Queryable, Clone, Identifiable)]
+#[derive(Eq, PartialEq, Debug, Queryable, Clone, Identifiable, Serialize)]
 #[table_name = "project_with_task_duration_view"]
 pub struct ProjectWithTaskDurationView {
     pub id: i32,

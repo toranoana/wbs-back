@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %} {% block title %}プロジェクト一覧 - {{ super()
+}}{% endblock title %} {% block head %}{{ super() }}{% endblock head %} {% block
+content %}
+<h1>プロジェクト一覧</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">タイトル</th>
+      <th scope="col">アクティブ</th>
+      <th scope="col">開始日時</th>
+      <th scope="col">終了日時</th>
+      <th scope="col">アクション</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for project in projects %}
+    <tr>
+      <td scope="row">{{ project.id }}</td>
+      <td>{{ project.title }}</td>
+      <td>{{ project.is_archived }}</td>
+      <td>{{ project.started_at }}</td>
+      <td>{{ project.ended_at }}</td>
+      <td>
+        <a href="/admin/project/{{ project.id }}/edit">編集</a>
+        <form method="post" action="/admin/project/delete">
+          <input type="hidden" name="id" value="{{ project.id }}" />
+          <button class="btn btn-primary" type="submit">論理削除</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock content %}

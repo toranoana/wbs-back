@@ -6,6 +6,7 @@ use actix_web::http::header;
 use actix_web::{middleware, App, HttpServer};
 use dotenv::{dotenv, from_filename};
 use std::env;
+use tera::Tera;
 
 // ログ出したいとき
 // #[macro_use]
@@ -52,7 +53,11 @@ async fn main() -> std::io::Result<()> {
     };
 
     let mut server = HttpServer::new(move || {
+
+        let tera =
+            Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")).unwrap();
         App::new()
+            .data(tera)
             .data(pool.clone())
             .data(schema.clone())
             .wrap(middleware::Logger::default())
