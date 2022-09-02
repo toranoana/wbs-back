@@ -1,4 +1,4 @@
-FROM rust:1.48 as builder
+FROM rust:1.63 as builder
 
 ARG WORKDIR=/usr/src/app
 

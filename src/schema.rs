@@ -1,4 +1,6 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     holidays (id) {
         id -> Int4,
         holiday_name -> Varchar,
@@ -8,7 +10,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     memos (id) {
         id -> Int4,
         task_id -> Int4,
@@ -19,7 +21,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     milestones (id) {
         id -> Int4,
         project_id -> Int4,
@@ -30,7 +32,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     projects (id) {
         id -> Int4,
         title -> Varchar,
@@ -43,7 +45,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     tasks (id) {
         id -> Int4,
         project_id -> Int4,
@@ -58,7 +60,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     users (id) {
         id -> Int4,
         display_name -> Varchar,
@@ -68,13 +70,13 @@ table! {
     }
 }
 
-joinable!(memos -> tasks (task_id));
-joinable!(memos -> users (user_id));
-joinable!(milestones -> projects (project_id));
-joinable!(tasks -> projects (project_id));
-joinable!(tasks -> users (user_id));
+diesel::joinable!(memos -> tasks (task_id));
+diesel::joinable!(memos -> users (user_id));
+diesel::joinable!(milestones -> projects (project_id));
+diesel::joinable!(tasks -> projects (project_id));
+diesel::joinable!(tasks -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(
+diesel::allow_tables_to_appear_in_same_query!(
     holidays,
     memos,
     milestones,
